@@ -1,0 +1,46 @@
+---
+- hosts:  all
+  become: yes
+  tasks:
+  - name: update packages
+    apt:
+      update_cache: yes
+      
+# Nodejs installation settings
+# Installation steps is followed from    
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04   
+
+- hosts: appserver
+  become: yes
+  vars:
+    folderpath: /home/ansible/nodesetup
+    appserverport: 8080
+    appserver_ip: 172.31.46.159
+  tasks:
+  - name: creating a nodesetup dirctory
+    file:
+      path: "{{ folderpath }}"
+      state: directory
+      mode: 0755   
+  - name: Downloading nodejs pakage setup
+    command: "curl -sL https://deb.nodesource.com/setup_8.x -o {{ folderpath }}/nodesource_setup.sh"
+  - name: Execute Downloaded Shell Script
+    command: "sudo bash {{ folderpath }}/nodesource_setup.sh"
+  - name: Installing nodejs
+    apt:
+      name: nodejs
+      state: present
+  - name: Installing "build-essential"
+    apt: 
+      name: build-essential     
+      state: present
+  - name: Copy the code
+    template: 
+      src: "templates/hello.js.j2"
+      dest: "{{ folderpath }}/hello.js"
+   -name: Install pm2
+    npm:
+      name: pm2
+      global: yes
+  - name: "Start node js app"
+    command: "pm2 start {{ folderpath }}/hello.js"        
