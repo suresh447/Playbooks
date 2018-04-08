@@ -1,6 +1,6 @@
 
 [webserver]
-172.31.20.122
+ip-172-31-20-122.us-east-2.compute.internal
 
 [appserver]
 ip-172-31-46-159.us-east-2.compute.internal
